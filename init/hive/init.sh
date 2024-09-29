@@ -17,6 +17,7 @@
 # under the License.
 #
 
+# remove command line `tail -f /dev/null` in the `/usr/local/sbin/start.sh`
 sed -i '$d' /usr/local/sbin/start.sh
 sed -i '$d' /usr/local/sbin/start.sh
 sed -i 's|hdfs://localhost:9000|hdfs://hive:9000|g' /usr/local/hive/conf/hive-site.xml

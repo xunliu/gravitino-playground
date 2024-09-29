@@ -19,7 +19,7 @@
 version: '3.0'
 services:
   hive:
-    image: apache/gravitino-playground:hive-2.7.3
+    image: apache/gravitino-ci:hive-0.1.14
     ports:
       - "3307:3306"
       - "19000:9000"
@@ -28,6 +28,10 @@ services:
     container_name: playground-hive
     environment:
       - HADOOP_USER_NAME=root
+      - HIVE_RUNTIME_VERSION=hive3
+      - DOCKER_ENV_RANGER_SERVER_URL=http://ranger:6080
+      - DOCKER_ENV_RANGER_HIVE_REPOSITORY_NAME:hiveDev
+      - DOCKER_ENV_RANGER_HDFS_REPOSITORY_NAME:hdfsDev
     entrypoint: /bin/bash /tmp/hive/init.sh
     volumes:
       - ./init/hive:/tmp/hive
@@ -41,6 +45,17 @@ services:
         limits:
           cpus: "3"
           memory: 3G
+
+  ranger:
+    image: apache/gravitino-ci:ranger-0.1.1
+    ports:
+      - "6080:6080"
+    container_name: playground-ranger
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 500M
 
   gravitino:
     image: apache/gravitino:0.6.0-incubating
