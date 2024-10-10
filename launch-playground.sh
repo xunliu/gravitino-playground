@@ -36,6 +36,10 @@ case "${1}" in
 esac
 
 cd ${playground_dir}
+
+init/spark/spark-dependency.sh
+init/gravitino/gravitino-dependency.sh
+
 docker-compose up ${components}
 
 # Clean Docker containers when you quit this script

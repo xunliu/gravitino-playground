@@ -1,3 +1,4 @@
+#!/bin/bash
 #
 # Licensed to the Apache Software Foundation (ASF) under one
 # or more contributor license agreements.  See the NOTICE file
@@ -16,17 +17,26 @@
 # specific language governing permissions and limitations
 # under the License.
 #
-echo "Start to download the jar package of JDBC"
-cp /tmp/gravitino/packages/mysql-connector-java-8.0.27.jar /root/gravitino/catalogs/jdbc-mysql/libs/mysql-connector-java-8.0.27.jar
-cp /tmp/gravitino/packages/postgresql-42.2.7.jar /root/gravitino/catalogs/jdbc-postgresql/libs/postgresql-42.2.7.jar
+set -ex
+
+gravitino_dir="$(dirname "${BASH_SOURCE-$0}")"
+gravitino_dir="$(cd "${gravitino_dir}">/dev/null; pwd)"
+. "${gravitino_dir}/../common/common.sh"
+
+
+# Prepare download packages
+if [[ ! -d "${gravitino_dir}/packages" ]]; then
+  mkdir -p "${gravitino_dir}/packages"
+fi
+
+MYSQL_CONNECTOR_JAVA_JAR="https://repo1.maven.org/maven2/mysql/mysql-connector-java/8.0.27/mysql-connector-java-8.0.27.jar"
+MYSQL_CONNECTOR_JAVA_MD5="${MYSQL_CONNECTOR_JAVA_JAR}.md5"
+download_and_verify "${MYSQL_CONNECTOR_JAVA_JAR}" "${MYSQL_CONNECTOR_JAVA_MD5}" "${gravitino_dir}"
+
+POSTGRESQL_JAR="https://repo1.maven.org/maven2/org/postgresql/postgresql/42.2.7/postgresql-42.2.7.jar"
+POSTGRESQL_MD5="${POSTGRESQL_JAR}.md5"
+download_and_verify "${POSTGRESQL_JAR}" "${POSTGRESQL_MD5}" "${gravitino_dir}"
+
+
 # wget https://repo1.maven.org/maven2/mysql/mysql-connector-java/8.0.27/mysql-connector-java-8.0.27.jar -O /root/gravitino/catalogs/jdbc-mysql/libs/mysql-connector-java-8.0.27.jar
 # wget https://jdbc.postgresql.org/download/postgresql-42.7.0.jar -O /root/gravitino/catalogs/jdbc-postgresql/libs/postgresql-42.7.0.jar
-cp /root/gravitino/catalogs/jdbc-postgresql/libs/postgresql-42.2.7.jar /root/gravitino/catalogs/lakehouse-iceberg/libs
-cp /root/gravitino/catalogs/jdbc-mysql/libs/mysql-connector-java-8.0.27.jar /root/gravitino/catalogs/lakehouse-iceberg/libs
-
-cp /root/gravitino/catalogs/jdbc-postgresql/libs/postgresql-42.2.7.jar /root/gravitino/iceberg-rest-server/libs
-cp /root/gravitino/catalogs/jdbc-mysql/libs/mysql-connector-java-8.0.27.jar /root/gravitino/iceberg-rest-server/libs
-cp /tmp/gravitino/gravitino.conf /root/gravitino/conf
-echo "Finish downloading"
-echo "Start the Gravitino Server"
-/bin/bash /root/gravitino/bin/gravitino.sh start

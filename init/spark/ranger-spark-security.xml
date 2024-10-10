@@ -41,5 +41,4 @@
         <name>ranger.plugin.spark.policy.source.impl</name>
         <value>org.apache.ranger.admin.client.RangerAdminRESTClient</value>
     </property>
-
 </configuration>

@@ -17,10 +17,12 @@
 # under the License.
 #
 mkdir -p /opt/spark/conf
+chown spark:spark /opt/spark/conf
 cp /tmp/spark/spark-defaults.conf /opt/spark/conf
-wget https://repo1.maven.org/maven2/org/apache/iceberg/iceberg-spark-runtime-3.4_2.12/1.5.2/iceberg-spark-runtime-3.4_2.12-1.5.2.jar  -O /opt/spark/jars/iceberg-spark-runtime-3.4_2.12-1.5.2.jar
-wget https://repo1.maven.org/maven2/org/apache/gravitino/gravitino-spark-connector-runtime-3.4_2.12/0.6.0-incubating/gravitino-spark-connector-runtime-3.4_2.12-0.6.0-incubating.jar -O /opt/spark/jars/gravitino-spark-connector-runtime-3.4_2.12-0.6.0-incubating.jar
-wget https://repo1.maven.org/maven2/mysql/mysql-connector-java/8.0.27/mysql-connector-java-8.0.27.jar -O /opt/spark/jars/mysql-connector-java-8.0.27.jar
-wget https://repo1.maven.org/maven2/org/apache/kyuubi/kyuubi-spark-authz_2.12/1.9.2/kyuubi-spark-authz_2.12-1.9.2.jar -O /opt/spark/jars/kyuubi-spark-authz_2.12-1.9.2.jar
+cp /tmp/spark/ranger-spark-security.xml /opt/spark/conf
+cp /tmp/spark/packages/iceberg-spark-runtime-3.4_2.12-1.5.2.jar /opt/spark/jars/iceberg-spark-runtime-3.4_2.12-1.5.2.jar
+cp /tmp/spark/packages/gravitino-spark-connector-runtime-3.4_2.12-0.6.0-incubating.jar /opt/spark/jars/gravitino-spark-connector-runtime-3.4_2.12-0.6.0-incubating.jar
+cp /tmp/spark/packages/mysql-connector-java-8.0.27.jar /opt/spark/jars/mysql-connector-java-8.0.27.jar
+cp /tmp/spark/packages/kyuubi-spark-authz-shaded_2.12-1.9.2.jar /opt/spark/jars/kyuubi-spark-authz-shaded_2.12-1.9.2.jar
 sh  /tmp/common/init_metalake_catalog.sh
 tail -f /dev/null
