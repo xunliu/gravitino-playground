@@ -38,6 +38,7 @@ esac
 cd ${playground_dir}
 
 init/spark/spark-dependency.sh
+init/jupyter/jupyter-dependency.sh
 init/gravitino/gravitino-dependency.sh
 
 docker-compose up ${components}

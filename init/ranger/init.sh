@@ -23,7 +23,10 @@ sed -i '$d' /tmp/start-ranger-services.sh
 /tmp/start-ranger-services.sh
 
 # https://ranger.apache.org/apidocs/resource_PublicAPIsv2.html#resource_PublicAPIsv2_createService_POST
+sleep 5s
 curl -iv -u admin:rangerR0cks! -d @/tmp/ranger/hiveDev.json -H "Content-Type: application/json" -X POST http://127.0.0.1:6080/service/public/v2/api/service
 curl -iv -u admin:rangerR0cks! -d @/tmp/ranger/hdfsDev.json -H "Content-Type: application/json" -X POST http://127.0.0.1:6080/service/public/v2/api/service
-
+curl -iv -u admin:rangerR0cks! -H "Content-Type: application/json" -X DELETE http://localhost:6080/service/plugins/policies/1
+curl -iv -u admin:rangerR0cks! -H "Content-Type: application/json" -X DELETE http://localhost:6080/service/plugins/policies/3
+curl -iv -u admin:rangerR0cks! -H "Content-Type: application/json" -X DELETE http://localhost:6080/service/plugins/policies/4
 tail -f /dev/null

@@ -15,7 +15,6 @@
 # KIND, either express or implied.  See the License for the
 # specific language governing permissions and limitations
 # under the License.
-#
 cp -r /tmp/gravitino/*.ipynb /home/jovyan
-export HADOOP_USER_NAME=root
+export HADOOP_USER_NAME=anonymous
 start-notebook.sh --NotebookApp.token=''
