@@ -36,7 +36,7 @@ if echo "$response" | grep -q "\"code\":0"; then
   true
 else
   # Create Hive catalog for experience Gravitino service
-  response=$(curl -X POST -H "Content-Type: application/json" -d '{"name":"catalog_hive","type":"RELATIONAL", "provider":"hive", "comment":"comment","properties":{"metastore.uris":"thrift://hive:9083", "spark.bypass.spark.sql.hive.metastore.jars":"path", "spark.bypass.spark.sql.hive.metastore.jars.path":"file:///opt/spark/jars/*", "authorization-provider": "ranger", "authorization.ranger.admin.url": "http://ranger:6080", "authorization.ranger.auth.type": "simple", "authorization.ranger.username": "admin", "authorization.ranger.password": "rangerR0cks!", "authorization.ranger.service.name": "hiveDev" }}' http://gravitino:8090/api/metalakes/metalake_demo/catalogs)
+  response=$(curl -X POST -H "Content-Type: application/json" -d '{"name":"catalog_hive","type":"RELATIONAL", "provider":"hive", "comment":"comment","properties":{"metastore.uris":"thrift://hive:9083", "spark.bypass.spark.sql.hive.metastore.jars":"path", "spark.bypass.spark.sql.hive.metastore.jars.path":"file:///opt/spark/jars/*"}}' http://gravitino:8090/api/metalakes/metalake_demo/catalogs)
   if echo "$response" | grep -q "\"code\":0"; then
     true # Placeholder, do nothing
   else
@@ -79,7 +79,7 @@ if echo "$response" | grep -q "\"code\":0"; then
   true
 else
   # Create Iceberg catalog for experience Gravitino service
-  response=$(curl -X POST -H "Accept: application/vnd.gravitino.v1+json" -H "Content-Type: application/json" -d '{ "name":"catalog_iceberg", "type":"RELATIONAL", "provider":"lakehouse-iceberg", "comment":"comment", "properties":{ "uri":"jdbc:mysql://mysql:3306/db", "catalog-backend":"jdbc", "warehouse":"hdfs://hive:9000/user/iceberg/warehouse/", "jdbc-user":"mysql", "jdbc-password":"mysql", "jdbc-driver":"com.mysql.cj.jdbc.Driver"} }' http://gravitino:8090/api/metalakes/metalake_demo/catalogs)
+  response=$(curl -X POST -H "Accept: application/vnd.gravitino.v1+json" -H "Content-Type: application/json" -d '{ "name":"catalog_iceberg", "type":"RELATIONAL", "provider":"lakehouse-iceberg", "comment":"comment", "properties":{ "uri":"jdbc:mysql://mysql:3306/db", "catalog-backend":"jdbc", "warehouse":"hdfs://hive:9000/user/iceberg/warehouse/", "jdbc-user":"mysql", "jdbc-password":"mysql", "jdbc-driver":"com.mysql.cj.jdbc.Driver", "spark.bypass.spark.sql.hive.metastore.jars":"path", "spark.bypass.spark.sql.hive.metastore.jars.path":"file:///opt/spark/jars/*",  "authorization-provider": "ranger", "authorization.ranger.admin.url": "http://ranger:6080", "authorization.ranger.auth.type": "simple", "authorization.ranger.username": "admin", "authorization.ranger.password": "rangerR0cks!", "authorization.ranger.service.name": "hiveDev"} }' http://gravitino:8090/api/metalakes/metalake_demo/catalogs)
   if echo "$response" | grep -q "\"code\":0"; then
     true # Placeholder, do nothing
   else

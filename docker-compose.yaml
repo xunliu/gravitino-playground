@@ -68,7 +68,7 @@ services:
           memory: 500M
 
   gravitino:
-    image: apache/gravitino:0.6.0-incubating
+    image: gravitino:0.7.0-SNAPSHOT
     entrypoint: /bin/bash /tmp/gravitino/init.sh
     ports:
       - "8090:8090"
@@ -181,7 +181,6 @@ services:
       - ./init/spark:/tmp/spark
       - ./init/common:/tmp/common
       - spark_jars:/opt/spark/jars
-      - spark_conf:/opt/spark/conf
     deploy:
       resources:
         limits:
@@ -196,7 +195,6 @@ services:
     volumes:
       - ./init/jupyter:/tmp/gravitino
       - spark_jars:/opt/spark/jars
-      - spark_conf:/opt/spark/conf
     entrypoint: /bin/bash /tmp/gravitino/init.sh
     depends_on:
       hive :
@@ -211,4 +209,3 @@ services:
 
 volumes:
   spark_jars:
-  spark_conf:
