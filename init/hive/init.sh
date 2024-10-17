@@ -23,7 +23,8 @@ sed -i '$d' /usr/local/sbin/start.sh
 cp /tmp/hive/core-site.xml /tmp/hadoop-conf
 sed -i 's|hdfs://localhost:9000|hdfs://hive:9000|g' /usr/local/hive/conf/hive-site.xml
 /bin/bash /usr/local/sbin/start.sh
-useradd -g hdfs anonymous
+useradd -g hdfs lisa
+useradd -g hdfs manager
 hdfs dfs -mkdir /user/iceberg/
 hdfs dfs -mkdir /user/iceberg/warehouse
 hdfs dfs -chmod 777 /user/iceberg/warehouse/
