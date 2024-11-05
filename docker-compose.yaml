@@ -1,15 +1,29 @@
 #
-# Copyright 2023 Datastrato Pvt Ltd.
-# This software is licensed under the Apache License version 2.
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
 #
-version: '3.0'
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+#
 services:
   hive:
-    image: datastrato/hive:2.7.3-no-yarn
+    image: apache/gravitino-playground:hive-2.7.3
     ports:
       - "3307:3306"
-      - "9000:9000"
-      - "9083:9083"
+      - "19000:9000"
+      - "19083:9083"
+      - "60070:50070"
     container_name: playground-hive
     environment:
       - HADOOP_USER_NAME=root
@@ -21,14 +35,10 @@ services:
       interval: 10s
       timeout: 60s
       retries: 5
-    deploy:
-      resources:
-        limits:
-          cpus: "3"
-          memory: 3G
+      start_period: 20s
 
   gravitino:
-    image: datastrato/gravitino:0.5.0
+    image: apache/gravitino:0.6.1-incubating
     entrypoint: /bin/bash /tmp/gravitino/init.sh
     ports:
       - "8090:8090"
@@ -37,24 +47,22 @@ services:
     depends_on:
       hive :
         condition: service_healthy
+      mysql :
+        condition: service_healthy
     volumes:
       - ./healthcheck:/tmp/healthcheck
       - ./init/gravitino:/tmp/gravitino
-    deploy:
-      resources:
-        limits:
-          cpus: "0.5"
-          memory: 500M
     healthcheck:
       test: ["CMD", "/tmp/healthcheck/gravitino-healthcheck.sh"]
       interval: 5s
       timeout: 60s
       retries: 5
+      start_period: 20s
 
   trino:
-    image: datastrato/trino:426-gravitino-0.5.0
+    image: apache/gravitino-playground:trino-435-gravitino-0.6.1-incubating
     ports:
-      - "8080:8080"
+      - "18080:8080"
     container_name: playground-trino
     environment:
       - HADOOP_USER_NAME=root
@@ -65,16 +73,19 @@ services:
     entrypoint:  /bin/bash /tmp/trino/init.sh
     volumes:
       - ./init/trino:/tmp/trino
+      - ./init/common:/tmp/common
+      - ./healthcheck:/tmp/healthcheck
     depends_on:
       hive :
         condition: service_healthy
       gravitino :
         condition: service_healthy
-    deploy:
-      resources:
-        limits:
-          cpus: "1"
-          memory: 2G
+    healthcheck:
+      test: ["CMD", "/tmp/healthcheck/trino-healthcheck.sh"]
+      interval: 10s
+      timeout: 60s
+      retries: 5
+      start_period: 20s
 
   postgresql:
     image: postgres:13
@@ -85,38 +96,34 @@ services:
       POSTGRES_PASSWORD: postgres
       ALLOW_IP_RANGE: 0.0.0.0/0
     ports:
-      - "5432:5432"
+      - "15432:5432"
     volumes:
       - ./init/postgres:/docker-entrypoint-initdb.d/
-    deploy:
-      resources:
-        limits:
-          cpus: "1"
-          memory: 500M
 
   mysql:
     image: mysql:8.0
     container_name: playground-mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=mysql
+      - MYSQL_USER=mysql
+      - MYSQL_PASSWORD=mysql
+      - MYSQL_DATABASE=db
     ports:
-      - "3306:3306"
+      - "13306:3306"
     volumes:
       - ./init/mysql:/docker-entrypoint-initdb.d/
-    environment:
-      MYSQL_ROOT_PASSWORD: mysql
-      MYSQL_USER: mysql
-      MYSQL_PASSWORD: mysql
-      MYSQL_DATABASE: db
     command:
       --default-authentication-plugin=mysql_native_password
       --character-set-server=utf8mb4
       --collation-server=utf8mb4_general_ci
       --explicit_defaults_for_timestamp=true
       --lower_case_table_names=1
-    deploy:
-      resources:
-        limits:
-          cpus: "1"
-          memory: 500M
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -pmysql"]
+      interval: 5s
+      timeout: 60s
+      retries: 5
+      start_period: 20s
 
   spark:
     image: spark:3.4.1-scala2.12-java11-ubuntu
@@ -125,11 +132,24 @@ services:
     environment:
       - HADOOP_USER_NAME=root
     ports:
-      - "4040:4040"
+      - "14040:4040"
     volumes:
       - ./init/spark:/tmp/spark
-    deploy:
-      resources:
-        limits:
-          cpus: "1"
-          memory: 1G
+      - ./init/common:/tmp/common
+
+  jupyter:
+    image: jupyter/pyspark-notebook:spark-3.4.1
+    container_name: playground-jupyter
+    ports:
+      - 18888:8888
+    volumes:
+      - ./init/jupyter:/tmp/gravitino
+    entrypoint: /bin/bash /tmp/gravitino/init.sh
+    depends_on:
+      hive :
+        condition: service_healthy
+      gravitino :
+        condition: service_healthy
+
+volumes:
+  spark_jars:
